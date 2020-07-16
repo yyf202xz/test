@@ -1,0 +1,22 @@
+<launch>
+  <group ns="RGB">
+    <node pkg="uvc_camera" name="GoPro" type="uvc_camera_node" output="screen">
+      <param name="device" type="string" value="/dev/video0"/>
+      <param name="width" type="int" value="1024"/>
+      <param name="height" type="int" value="768"/>
+      <param name="frame_id" value="GoPro"/>
+    </node>
+  </group>
+
+  <group ns="spectrum">
+    <node pkg="uvc_camera" name="Spectrum_Catcher" type="uvc_camera_node" output="screen">
+      <param name="device" type="string" value="/dev/video2"/>
+      <param name="frame_id" value="Spectrum_Catcher"/>
+    </node>
+  </group>
+  
+  <node name="sight" pkg="img_recog" type="sight.py" output="screen"/>
+
+</launch>
+
+<?ignore v4l2-ctl --list-devices?>

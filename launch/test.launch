@@ -1,0 +1,8 @@
+<launch>
+  <node name="uvc_camera_node"   pkg="uvc_camera" type="uvc_camera_node" />
+  <node name="test" pkg="img_recog" type="test.py" output="screen"/>
+  <node name="rqt_image_view" pkg="rqt_image_view" type="rqt_image_view" output="screen">
+    <remap from="image" to="/circle">
+    </remap>
+  </node>
+</launch>

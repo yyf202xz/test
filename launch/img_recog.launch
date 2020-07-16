@@ -1,0 +1,8 @@
+<launch>
+  <node name="uvc_camera_node"   pkg="uvc_camera" type="uvc_camera_node" />
+  <node name="color_img_recog" pkg="img_recog" type="color_img_recog.py" output="screen"/>
+  <node name="image_view" pkg="image_view" type="image_view" output="screen">
+    <remap from="image" to="/image_raw">
+    </remap>
+  </node>
+</launch>
