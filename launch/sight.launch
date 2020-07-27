@@ -5,20 +5,21 @@
       <param name="width" type="int" value="1024"/>
       <param name="height" type="int" value="768"/>
       <param name="frame_id" value="GoPro"/>
+      <param name="fps" value="30"/>
     </node>
   </group>
 
+<?ignore
   <group ns="spectrum">
     <node pkg="uvc_camera" name="Spectrum_Catcher" type="uvc_camera_node" output="screen">
       <param name="device" type="string" value="/dev/video2"/>
       <param name="frame_id" value="Spectrum_Catcher"/>
     </node>
   </group>
-  
+?>
+
   <node name="sight" pkg="img_recog" type="sight.py" output="screen"/>
-  <node name="rqt_image_view" pkg="rqt_image_view" type="rqt_image_view" output="screen">
-  </node>
+
 </launch>
 
-<?ignore v4l2-ctl --list-devices
-sudo apt-get install v4l-utils?>
+<?ignore v4l2-ctl --list-devices?>
