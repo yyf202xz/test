@@ -125,8 +125,8 @@ if __name__ == "__main__":
     i = dis * 1000 + 111.5
 
     world = np.array([[0],[(i + 93) * math.tan(math.radians(2.85))],[i],[1]])
-    rect1 = np.array([[i * math.tan(math.radians(1.2))],[(i + 93) * math.tan(math.radians(2.85))],[i],[1]])
-    rect2 = np.array([[-i * math.tan(math.radians(1.2))],[-(i + 93) * math.tan(math.radians(5.75))],[i],[1]])
+    rect1 = np.array([[(i+93) * math.tan(math.radians(1.2))],[(i + 93) * math.tan(math.radians(2.85))],[i],[1]])
+    rect2 = np.array([[-(i+93) * math.tan(math.radians(1.2))],[-(i + 93) * math.tan(math.radians(5.75))],[i],[1]])
     a = np.dot(inner,outer)
 
     b = project_n_undistort(a,world)
