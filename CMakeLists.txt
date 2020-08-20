@@ -10,10 +10,15 @@ project(img_recog)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
+  cv_bridge
   std_msgs
+  image_transport
   message_generation
 )
 
+find_package(OpenCV 4.4.0 REQUIRED
+)
+set(OpenCV_DIR=/usr/local/lib/cmake/opencv4)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -107,6 +112,7 @@ add_service_files(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
+CATKIN_DEPENDS message_runtime
 #  INCLUDE_DIRS include
 #  LIBRARIES img_recog
 #  CATKIN_DEPENDS roscpp rospy std_msgs
@@ -121,13 +127,16 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
+  /usr/local/include
   ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS} 
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/img_recog.cpp
 # )
+
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -154,6 +163,12 @@ include_directories(
 #   ${catkin_LIBRARIES}
 # )
 
+add_executable(sight
+        scripts/sight.cpp)
+target_link_libraries(sight
+        ${catkin_LIBRARIES}
+        ${OpenCV_LIBRARIES}
+        )
 #############
 ## Install ##
 #############
