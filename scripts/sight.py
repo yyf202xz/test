@@ -29,13 +29,12 @@ def project_n_undistort(a,world):
     b = b[0:2]
     b = cv2.undistortPoints(b, mtx, dist, None, mtx)
     b = b[0][0]
-    print b
     return b
 
 class Sight(object):
     def __init__(self):
         self.sight_pub = rospy.Publisher('Sight', Image, queue_size=1)
-        self.image_sub1 = rospy.Subscriber('image_raw', Image, self.callback)
+        self.image_sub1 = rospy.Subscriber('RGB/image_raw', Image, self.callback)
         self.undistort_pub = rospy.Publisher('undistort_image', Image, queue_size=1)
         
         self.spectrum_pub = rospy.Publisher('Rotated_spectrum_image', Image, queue_size=1)
@@ -53,8 +52,10 @@ class Sight(object):
         dimensions = ImgFrame.shape[:2]
         dimensions = dimensions[::-1]
 
+	#歪みマップを求める
+	map = cv2.initUndistortRectifyMap(mtx, dist, None, mtx, (dimensions[0],dimensions[1]), cv2.CV_32FC1)
         #歪み修正   500.94972539 714.4117358
-        ImgFrame = cv2.undistort(ImgFrame, mtx, dist, None, mtx)
+        ImgFrame = cv2.remap(ImgFrame, map[0], map[1], cv2.INTER_AREA)
 
         try:
             self.undistort_pub.publish(self._bridge.cv2_to_imgmsg(ImgFrame, 'bgr8'))

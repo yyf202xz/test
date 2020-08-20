@@ -25,11 +25,11 @@ std::array<float, 2> c;
 std::array<float, 2> c2;
 std::array<float, 2> target;
 
-
-
+int first;
 int width, height;
-int dis,i;
 cv::Size imageSize(width, height);
+int dis,i;
+float resize_val;
 cv::Mat mapx, mapy;
 cv::Mat undistorted;
 
@@ -62,6 +62,7 @@ class Sight
   image_transport::Subscriber image_sub1_;
   image_transport::Publisher sight_pub_;
   image_transport::Publisher undistort_pub_;
+  image_transport::Publisher resize_pub_;
   ros::Publisher point_pub_ = nh_.advertise<img_recog::points>("target_point", 1);
 
   image_transport::Publisher spectrum_pub_;
@@ -74,10 +75,11 @@ public:
     : it_(nh_)
   {
     // カラー画像をサブスクライブ
-    image_sub1_ = it_.subscribe("/image_raw", 1, 
+    image_sub1_ = it_.subscribe("RGB/image_raw", 1, 
       &Sight::callback, this);
     sight_pub_ = it_.advertise("Sight", 1);
     undistort_pub_ = it_.advertise("undistort_image", 1);
+    resize_pub_ = it_.advertise("resized_image", 1);
  
     //spectrum_pub_ = it_.advertise("Rotated_spectrum_image", 1);
     //image_sub2 = it_.subscribe("spectrum/image_raw",
@@ -96,31 +98,41 @@ public:
   // コールバック関数
   void callback(const sensor_msgs::ImageConstPtr& msg)
   {
-    cv_bridge::CvImagePtr cv_ptr,cv_ptr2;
+    cv_bridge::CvImagePtr cv_ptr, cv_ptr2, cv_ptr3;
     img_recog::points point;
     try
     {
       // ROSからOpenCVの形式にtoCvCopy()で変換。cv_ptr->imageがcv::Matフォーマット。
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
       cv_ptr2 = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+      cv_ptr3 = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e)
     {
       ROS_ERROR("cv_bridge exception: %s", e.what());
       return;
     }
-    cv::Size imageSize(width, height);
-    imageSize.width = cv_ptr->image.cols;
-    imageSize.height = cv_ptr->image.rows;
-    // 歪みマップを求める  
-    cv::initUndistortRectifyMap(mtx, dist, cv::Mat(), mtx, imageSize, CV_32FC1, mapx, mapy);
+
+    if(first == 1)
+    {
+      imageSize.width = cv_ptr->image.cols;
+      imageSize.height = cv_ptr->image.rows;
+      //歪みマップを求める  
+      cv::initUndistortRectifyMap(mtx, dist, cv::Mat(), mtx, imageSize, CV_32FC1, mapx, mapy);
+      first =0;
+    }
+
+    
     //歪み修正
     cv::remap(cv_ptr->image, cv_ptr2->image, mapx, mapy, cv::INTER_LINEAR);
     undistort_pub_.publish(cv_ptr2->toImageMsg());
+    //resize
+    cv::resize(cv_ptr2->image, cv_ptr3->image, cv::Size(), resize_val, resize_val);
+    resize_pub_.publish(cv_ptr3->toImageMsg());
 
     
-    target[0] = (c[0]+c2[0])/2;
-    target[1] = (c[1]+c2[1])/2;
+    target[0] = (c[0]+c2[0])/2/resize_val;
+    target[1] = (c[1]+c2[1])/2/resize_val;
     //std::cout<<target<<std::endl;
     
     point.point1_x = target[0];
@@ -148,6 +160,8 @@ public:
 
 int main(int argc, char** argv)
 { 
+  first = 1;
+  resize_val = 0.5;
   //inner = np.array([[614.470458984375, 0, 1036.625311183976, 0], [0, 730.07958984375, 773.5514250291162, 0], [0, 0, 1, 0]])#内部パラメーター 2048*1536
   //outer = np.dot(np.array([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]),np.array([[1,0,0,0],[0,1,0,88],[0,0,1,0],[0,0,0,1]]))外部パラメーター 2048*1536
   //inner = np.array([[307.6017761230469, 0, 500.9403417435533, 0], [0, 342.7832641601562, 379.5612670888731, 0], [0, 0, 1, 0]])#内部パラメーター 1024*768

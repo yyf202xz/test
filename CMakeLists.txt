@@ -16,7 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-find_package(OpenCV 4.4.0 REQUIRED
+find_package(OpenCV 4.0.0 REQUIRED
 )
 set(OpenCV_DIR=/usr/local/lib/cmake/opencv4)
 

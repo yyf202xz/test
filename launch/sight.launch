@@ -9,7 +9,7 @@
     </node>
   </group>
 
-  <node name="sight" pkg="img_recog" type="sight.py" output="screen"/>
+  <node name="sight" pkg="img_recog" type="sight" output="screen"/>
 
 </launch>
 
