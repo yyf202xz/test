@@ -1,15 +1,11 @@
 #include <iostream>
 #include <cmath>
 #include <array>
-#//include <eigen3/Eigen/Core>
-//#include <eigen3/Eigen/Dense>
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include </home/robotics/catkin_ws/src/vision_opencv-opencv4/cv_bridge/include/cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <opencv4/opencv2/opencv.hpp>
-//#include <opencv4/opencv2/imgproc/imgproc.hpp>
-//#include <opencv4/opencv2/highgui/highgui.hpp>
 #include "img_recog/points.h"
 
 cv::Mat inner;
@@ -42,9 +38,6 @@ void triangle(cv::Mat input, int x, int y){
     pt[0] = cv::Point(x, y);
     pt[1] = cv::Point(x-10, y+20);
     pt[2] = cv::Point(x+10, y+20);
-    //cv::circle(image, pt1, 0, scalar, -1);
-    //cv::circle(image, pt2, 0, scalar, -1);
-    //cv::circle(image, pt3, 0, scalar, -1);
     cv::fillConvexPoly(input, pt, 3, cv::Scalar(0,0,255));
 }
 
@@ -150,41 +143,6 @@ public:
     cv::putText(cv_ptr2->image, ">3m", cv::Point((int)(b_3[0]-90), (int)b_3[1]), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(0,0,255), 2);
 
     sight_pub_.publish(cv_ptr2->toImageMsg());
-
-/*  
-    cv::Mat hsv_image, color_mask, gray_image, cv_image2, cv_image3;
-    // RGB表色系をHSV表色系へ変換して、hsv_imageに格納
-    cv::cvtColor(cv_ptr->image, hsv_image, CV_BGR2HSV);
-    
-    // // 色相(Hue), 彩度(Saturation), 明暗(Value, brightness)
-    // 指定した範囲の色でマスク画像color_mask(CV_8U:符号なし8ビット整数)を生成 
-    // マスク画像はcv:c:Mat_<float>(1, 5) 指定した範囲の色に該当する要素は255(8ビットすべて1)、それ以外は0        
-    cv::inRange(hsv_image, cv::Scalar(150, 100, 50, 0) , cv::Scalar(180, 255, 255, 0), color_mask);
-    cv::bitwise_and(cv_ptr->image, cv_ptr->image, cv_image2, color_mask);.at<float>
-    // エッジを検出するためにCannyアルゴリズムを適用
-    cv::Canny(cv_ptr3->image, cv_ptr3->image, 15.0, 30.0, 3);
-
-    // ウインドウに円を描画。中心(100, 100), 半径20[pixel]、色緑
-    cv::circle(cv_ptr->image, cv::Point(100, 100), 20, CV_RGB(0,255,0));
-
-    // 画像サイズを縦横半分に変更
-    cv::Mat cv_half_image, cv_half_image2, cv_half_image3;
-    cv::resize(cv_ptr->image, cv_half_image,cv::Size(),0.5,0.5);
-    cv::resize(cv_image2, cv_half_image2,cv::Size(),0.5,0.5);
-    cv::resize(cv_ptr3->image, cv_half_image3,cv::Size(),0.5,0.5);
-
-    std::cout << "Mat type1: " << cv_half_image.type() << std::endl;
-    //std::cout << "Mat type3: " << cv_ptr3->image.type() << std::endl;
-    // ウインドウ表示
-    cv::imshow("Original Image", cv_half_image);
-    cv::imshow("Result Image", cv_half_image2);
-    //cv::imshow("Edge Image", cv_ptr3->image);/////////////
-    cv::waitKey(3);
-    
-    //エッジ画像をパブリッシュ。OpenCVからROS形式にtoImageMsg()で変換。
-    image_pub_.publish(cv_ptr3->toImageMsg());
-    */
-    //std::cout << "version =" <<CV_VERSION<<std::endl;
   }
 };
 
